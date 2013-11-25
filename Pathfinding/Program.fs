@@ -7,38 +7,38 @@ open Square
 let preset = "+++++++++++++++
 +++++++++OO++++
 +++++++++O+++++
-+++++OOOOO+++++
++++++O+OOO+++++
 ++OOO+++O++++++
-OOO++O++O++++++
-+++OOOOOO++++++
-+++O+++O+++++++
-OOO+OO+O+++++++
+++++++++OOOOO++
++++OOO++O++++++
++++O+++OO++++++
+O+++OO+O+++++++
 ++OOOO+O+++++++
 ++++++OO+++++++
-+OOOOOOO+OOOOOO
-+++++++O+++++++
++OO+OOO++OOOOOO
++++++++++++++++
 OOOOOO+OOOOOOO+
 +++++++++++++++"
 
 let board =
     let roo = new System.Random ()
-    let tmp = Array2D.zeroCreate 15 15
+    let tmp = Array2D.zeroCreate 66 66
     let input = preset.Split '\n'
-    for i = 0 to 14 do
-        for j = 0 to 14 do
+    for i = 0 to Array2D.length1 tmp - 1 do
+        for j = 0 to Array2D.length1 tmp - 1 do
             tmp.[i,j] <- new Square ()
             //if input.[i].[j] = 'O' then tmp.[i,j].State <- SquareState.Wall
-            if roo.Next(100) > 85 then tmp.[i,j].State <- SquareState.Wall
+            if roo.Next(100) > 65 then tmp.[i,j].State <- SquareState.Wall
     tmp
 
 let boundsCheck x y =
-    if x < 15 && x >= 0 && y < 15 && y >= 0 then true
+    if x < Array2D.length1 board && x >= 0 && y < Array2D.length2 board && y >= 0 then true
     else false
 
 ///returns the heuristic value, with dX and dY being the destination coordinates
 let heuristic x y dX dY =
-    (abs (x - dX) + abs (y - dY)) * 10
-    //int (sqrt (float ((dX - x) * (dX - x) + (dY - y) * (dY - y)))) * 10
+    //(abs (x - dX) + abs (y - dY)) * 10
+    int (sqrt (float ((dX - x) * (dX - x) + (dY - y) * (dY - y)))) * 5
 
 let drawBoard () =
     Console.Clear ()
@@ -71,7 +71,7 @@ let pathFind x0 y0 x1 y1 =
         for i = -1 to 1 do
             for j = -1 to 1 do
                 if boundsCheck (x + i) (y + j) && (board.[x + i, y + j].Distance = 10000 && not board.[x + i, y + j].Visited && board.[x + i, y + j].State <> SquareState.Wall) then
-                    board.[x + i, y + j].Distance <- board.[x,y].Distance + 10
+                    board.[x + i, y + j].Distance <- board.[x,y].Distance + (new System.Random ()).Next (1, 20)
                     board.[x + i, y + j].H <- heuristic (x + i) (y + j) x1 y1
         board.[x,y].State <- SquareState.Path
         board.[x,y].Visited <- true
@@ -110,6 +110,6 @@ let pathFind x0 y0 x1 y1 =
         board.[leasX, leasY].IsPath <- true
     ()
 
-pathFind 0 0 10 8
+pathFind 1 1 50 57
 drawBoard ()
 Console.ReadKey true |> ignore
